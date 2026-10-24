@@ -1,0 +1,95 @@
+version: 1
+tools:
+  - id: claude
+    name: Claude
+    command: claude
+    rolling_window_hours: 5
+    max_concurrent: 2
+    cooldown_minutes: 5
+    enabled: true
+    budget_limit: 0
+    models:
+      - id: fable-5.1
+        name: Fable 5.1
+        model_id: claude-fable-5-1
+        rate_per_hour: 0
+        cost_per_run: 0
+        enabled: true
+      - id: opus-5.5
+        name: Opus 5.5
+        model_id: claude-opus-5-5
+        rate_per_hour: 0
+        cost_per_run: 0
+        enabled: true
+      - id: sonnet-5
+        name: Sonnet 5
+        model_id: claude-sonnet-5
+        rate_per_hour: 0
+        cost_per_run: 0
+        enabled: true
+      - id: haiku-4.5
+        name: Haiku 4.5
+        model_id: claude-haiku-4-5-20251001
+        rate_per_hour: 0
+        cost_per_run: 0
+        enabled: true
+  - id: codex
+    name: Codex
+    command: codex
+    rolling_window_hours: 5
+    max_concurrent: 2
+    cooldown_minutes: 5
+    enabled: true
+    budget_limit: 0
+    models:
+      - id: gpt-6-astra
+        name: GPT-6 Astra
+        model_id: gpt-6-astra
+        rate_per_hour: 0
+        cost_per_run: 0
+        enabled: true
+      - id: gpt-6-sol
+        name: GPT-6 Sol
+        model_id: gpt-6-sol
+        rate_per_hour: 0
+        cost_per_run: 0
+        enabled: true
+      - id: gpt-6-luna
+        name: GPT-6 Luna
+        model_id: gpt-6-luna
+        rate_per_hour: 0
+        cost_per_run: 0
+        enabled: true
+  - id: kimi
+    name: Kimi
+    command: kimi
+    rolling_window_hours: 5
+    max_concurrent: 2
+    cooldown_minutes: 5
+    enabled: true
+    budget_limit: 0
+    models:
+      - id: k3
+        name: K3
+        model_id: k3
+        rate_per_hour: 0
+        cost_per_run: 0
+        enabled: true
+      - id: k3-256k
+        name: K3 256K
+        model_id: k3-256k
+        rate_per_hour: 0
+        cost_per_run: 0
+        enabled: true
+      - id: k2.8-preview
+        name: K2.8 Preview
+        model_id: kimi-for-coding
+        rate_per_hour: 0
+        cost_per_run: 0
+        enabled: true
+      - id: k2.7-highspeed
+        name: K2.7 HighSpeed
+        model_id: kimi-for-coding-highspeed
+        rate_per_hour: 0
+        cost_per_run: 0
+        enabled: true
