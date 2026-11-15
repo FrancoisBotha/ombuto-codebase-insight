@@ -15,6 +15,7 @@ that never feeds back into computed facts.
   (`--om-*` tokens) and renderer components.
 - Parsing: `web-tree-sitter` (WASM) + per-language grammars (TS/JS, Python,
   Java, C#, Go, Rust, SQL) — one parser API for every language; no native builds.
+  Grammar `.wasm` files are vendored in `resources/grammars/` (see §4).
 - Git: system git CLI via `simple-git` — fast, complete log/numstat/blame.
 - Storage: SQLite via `better-sqlite3`, one database per repo — incremental
   writes during indexing, FTS5 built in.
@@ -107,9 +108,19 @@ access.
   prerequisite, checked on the Welcome screen.
 - **`web-tree-sitter` (WASM), not native tree-sitter bindings.** One build for
   every OS, no grammar compile step; slower parsing is acceptable at this scale.
+- **Grammars vendored as `.wasm` files, not npm dependencies.** The official
+  grammar packages ship usable `.wasm` files but also run native install
+  scripts the app never uses. The SQL grammar publishes no `.wasm` at all, so
+  it is built from source. The `tree-sitter-wasms` bundle was rejected
+  because it targets an older parser ABI and fails to load. The files, a
+  manifest (source, version, sha256) and their licences are committed and
+  refreshed by `scripts/vendor-grammars.mjs`. The cost is about 24 MB in git.
 - **`better-sqlite3`, not `sql.js` (Ombuto Code's choice).** Incremental writes
-  instead of whole-file rewrites, fast bulk inserts, FTS5 included. Costs a
-  native rebuild against Electron, already handled in Ombuto Code.
+  instead of whole-file rewrites, fast bulk inserts, FTS5 included. It is a
+  native module, but v13+ ships N-API prebuilds: the same binary loads in
+  Electron and in plain Node (unit tests), so no Electron rebuild step is
+  needed. Moving to a version without N-API prebuilds would bring back the
+  rebuild and running tests under Electron's Node.
 - **Incremental extraction keyed by blob SHA and commit.** Instant reopen,
   seconds to re-analyse after a pull. Full re-analysis every time is too slow on
   large histories.
