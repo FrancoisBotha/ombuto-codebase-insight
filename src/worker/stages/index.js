@@ -6,8 +6,10 @@
 // number of rows written; see src/worker/stageRunner.js for the ctx shape.
 // `run: null` means the stage is not implemented yet and the runner records
 // it as `skipped`. The ticket that implements a stage replaces its `null`.
+import { extractFilesStage } from './extractFiles.js';
+
 export const STAGES = Object.freeze([
-  { id: 'extract_files', label: 'Extract files', run: null },
+  extractFilesStage,
   { id: 'extract_history', label: 'Extract history', run: null },
   { id: 'transform', label: 'Transform structure & history', run: null },
   { id: 'deps_secrets', label: 'Dependencies & secrets', run: null },

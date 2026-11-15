@@ -13,11 +13,13 @@
 //     that runs hooks, can be invoked through this module.
 //
 // Used by the main process (folder validation, git check) and by the pipeline
-// worker (extraction stages). Both `runGit` (buffered) and `streamGit`
-// (streamed, for large `ls-tree` / `cat-file --batch` output) accept injectable
-// `execFile` / `spawn` implementations so unit tests can inspect invocations.
+// worker (extraction stages). `runGit` (buffered), `streamGit` (streamed, for
+// large `ls-tree` / `cat-file --batch` output) and `runGitSync` (synchronous,
+// for pipeline stages that run inside a better-sqlite3 transaction) accept
+// injectable `execFile` / `spawn` / `execFileSync` implementations so unit
+// tests can inspect invocations.
 
-import { execFile as nodeExecFile, spawn as nodeSpawn } from 'node:child_process';
+import { execFile as nodeExecFile, execFileSync as nodeExecFileSync, spawn as nodeSpawn } from 'node:child_process';
 
 export const DEFAULT_TIMEOUT_MS = 60_000;
 export const DEFAULT_MAX_BUFFER = 64 * 1024 * 1024;
@@ -253,6 +255,65 @@ export function runGit(args, options = {}) {
       },
     );
   });
+}
+
+/**
+ * Runs git synchronously and returns its stdout. For pipeline stages, which
+ * execute inside a synchronous better-sqlite3 transaction (stageRunner) and so
+ * cannot await `runGit`. Same safety rules as `runGit`: argument array, no
+ * shell, safe global flags, scrubbed environment, read-only subcommands only.
+ *
+ * `input` is written to git's stdin, so `cat-file --batch` can be fed a list
+ * of object names. `timeoutMs` kills git if it runs longer than that.
+ *
+ * @param {string[]} args
+ * @param {object} [options]
+ * @param {string} [options.cwd]
+ * @param {string|Buffer} [options.input]
+ * @param {number} [options.timeoutMs]      overall timeout (default 60 s)
+ * @param {number} [options.maxBuffer]      stdout cap (default 64 MiB)
+ * @param {'buffer'|'utf8'} [options.encoding]  default 'buffer' (raw blob bytes)
+ * @param {string} [options.gitPath]
+ * @param {Function} [options.execFileSync] injectable child_process.execFileSync
+ * @returns {{stdout: Buffer|string, stderr: string, exitCode: 0}}
+ */
+export function runGitSync(args, options = {}) {
+  const {
+    cwd,
+    input,
+    timeoutMs = DEFAULT_TIMEOUT_MS,
+    maxBuffer = DEFAULT_MAX_BUFFER,
+    encoding = 'buffer',
+    gitPath = 'git',
+    execFileSync = nodeExecFileSync,
+    env,
+  } = options;
+  const argv = buildGitArgs(args);
+
+  try {
+    const stdout = execFileSync(gitPath, argv, {
+      cwd,
+      env: buildGitEnv(env),
+      input,
+      timeout: timeoutMs,
+      maxBuffer,
+      // execFileSync returns a Buffer when no encoding is given.
+      encoding: encoding === 'buffer' ? undefined : encoding,
+      windowsHide: true,
+      // stderr is captured (not inherited) so it can be reported on failure.
+      stdio: ['pipe', 'pipe', 'pipe'],
+      // Deliberately no `shell` option.
+    });
+    return { stdout, stderr: '', exitCode: 0 };
+  } catch (err) {
+    // execFileSync reports the exit code as `status`, a full buffer as ENOBUFS
+    // and a timeout as ETIMEDOUT + signal; normalise to toGitError's shape.
+    const shaped = Object.assign(new Error(err.message), err);
+    if (typeof err.status === 'number') shaped.code = err.status;
+    else if (err.code === 'ENOBUFS') shaped.code = 'ERR_CHILD_PROCESS_STDIO_MAXBUFFER';
+    else if (err.code === 'ETIMEDOUT' || (err.signal && err.status == null)) shaped.killed = true;
+    throw toGitError(shaped, { args, cwd, stderr: err.stderr, timeoutMs });
+  }
 }
 
 /**

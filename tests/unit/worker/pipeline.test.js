@@ -6,6 +6,7 @@ import { EventEmitter } from 'node:events';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { simpleGit } from 'simple-git';
 import { insightDbPath, repoId } from '../../../src/shared/db/insightDb.js';
 import { WORKER_MSG } from '../../../src/shared/ipcChannels.js';
 import { attachWorker } from '../../../src/worker/pipeline.js';
@@ -70,7 +71,18 @@ describe('pipeline worker', () => {
     expect(port.posted.at(-1)).toMatchObject({ repoId: repoId(repoPath), commitSha: SHA });
   });
 
-  it('registers the real stage list; stages without an implementation are skipped', () => {
+  it('registers the real stage list; stages without an implementation are skipped', async () => {
+    // The real extract_files stage (OPINV-004) reads the repository, so the
+    // temp folder has to be a git repo with a commit at the given head sha.
+    const git = simpleGit(repoPath);
+    await git.init();
+    await git.addConfig('user.email', 'test@example.com');
+    await git.addConfig('user.name', 'Test');
+    fs.writeFileSync(path.join(repoPath, 'a.txt'), 'hello\n');
+    await git.add('.');
+    await git.commit('init');
+    const headSha = (await git.revparse(['HEAD'])).trim();
+
     expect(STAGES.length).toBeGreaterThan(0);
     for (const s of STAGES) {
       expect(typeof s.id).toBe('string');
@@ -87,7 +99,7 @@ describe('pipeline worker', () => {
     ]);
 
     attachWorker(port);
-    port.send(startRun());
+    port.send(startRun({ headSha }));
     const skipped = port.posted.filter((m) => m.type === WORKER_MSG.STAGE_SKIPPED).map((m) => m.stage);
     const unimplemented = STAGES.filter((s) => s.run === null).map((s) => s.id);
     expect(skipped).toEqual(unimplemented);
