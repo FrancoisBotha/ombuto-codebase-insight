@@ -1,6 +1,5 @@
 # Dependencies
 node_modules/
-package-lock.json
 yarn.lock
 
 # Environment
@@ -60,3 +59,6 @@ terraform/.terraform.lock.hcl
 # Logs
 *.log
 npm-debug.log*
+
+# Node / Vite / Electron (added by Initiate Stack)
+.vite/

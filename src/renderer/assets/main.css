@@ -1,0 +1,7 @@
+/* Ombuto Code design tokens (--om-*) are brought in by a later ticket;
+   see docs/References/Ombuto Codebase Insight prototype/. */
+html,
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+}
