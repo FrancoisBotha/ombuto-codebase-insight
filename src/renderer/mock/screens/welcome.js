@@ -1,0 +1,3 @@
+// Screen-local sample data, copied verbatim from the prototype's renderVals().
+// [name, path, lang, score, when, status, statusFg]
+export const WELCOME_RECENTS=[['harbor-api','~/dev/harbor-api','TypeScript',72,'2 hours ago','main · 612 files','var(--om-text-muted)'],['ledger-web','~/dev/ledger-web','Vue',84,'3 days ago','main · 418 files','var(--om-text-muted)'],['infra-terraform','~/work/platform/infra-terraform','HCL',58,'2 weeks ago','prod · 1 new critical','var(--om-danger)'],['legacy-billing','~/inherited/legacy-billing','Java',41,'1 month ago','Partial — git history unavailable','var(--om-warning)']];

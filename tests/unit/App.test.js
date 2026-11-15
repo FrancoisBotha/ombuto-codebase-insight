@@ -9,11 +9,12 @@ describe('App.vue', () => {
     delete window.insight;
   });
 
-  it('renders the title and the version from the preload bridge', async () => {
+  it('renders the shell title and the version from the preload bridge', async () => {
     window.insight = { getAppInfo: async () => ({ name: 'insight', version: '9.9.9' }) };
-    const wrapper = mount(App, { global: { plugins: [createPinia()] } });
+    const wrapper = mount(App, { global: { plugins: [createPinia()], directives: { hover: {} } } });
     await flushPromises();
-    expect(wrapper.text()).toContain('Ombuto Codebase Insight');
-    expect(wrapper.text()).toContain('v9.9.9');
+    expect(wrapper.text()).toContain('Codebase Insight');
+    expect(wrapper.text()).toContain('Codebase Insight 9.9.9');
+    wrapper.unmount();
   });
 });

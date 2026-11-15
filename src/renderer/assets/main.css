@@ -1,7 +1,19 @@
-/* Ombuto Code design tokens (--om-*) are brought in by a later ticket;
-   see docs/References/Ombuto Codebase Insight prototype/. */
-html,
-body {
-  margin: 0;
-  font-family: system-ui, sans-serif;
-}
+/* Ombuto Code Design System tokens and component CSS, copied verbatim from the
+   prototype (docs/References/Ombuto Codebase Insight prototype/…/_ds/…/tokens/).
+   Fonts and icons are bundled locally from npm (see main.js) instead of the
+   prototype's Google Fonts / jsDelivr imports. See docs/Architecture/prototype-port.md. */
+@import './ds/colors.css';
+@import './ds/typography.css';
+@import './ds/spacing.css';
+@import './ds/components.css';
+
+/* Prototype page styles (Codebase Insight.dc.html <style>), verbatim. */
+html,body{margin:0;height:100%;background:#161a1f}
+a{color:var(--om-blue);text-decoration:none}a:hover{color:var(--om-blue-hover)}
+:root{--ai:#a5b4fc;--ai-line:rgba(129,140,248,.45);--ai-bg:rgba(129,140,248,.07)}
+[data-theme="light"]{--ai:#4338ca;--ai-line:rgba(67,56,202,.35);--ai-bg:rgba(67,56,202,.05)}
+::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:#444c56;border-radius:4px}::-webkit-scrollbar-track{background:transparent}
+
+/* Frameless window: the custom title bar is the drag region (Electron). */
+.app-drag{-webkit-app-region:drag}
+.app-no-drag{-webkit-app-region:no-drag}

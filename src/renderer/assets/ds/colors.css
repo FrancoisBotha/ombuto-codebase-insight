@@ -1,0 +1,46 @@
+/* Ombuto Code — colours. Dark is the default theme (index.html ships data-theme="dark"). Values lifted from main.css, App.vue, BoardList.vue, KanbanColumn.vue, StatusBar.vue, titlebar.css. */
+:root{
+/* surfaces */
+--om-bg:#161a1f;--om-surface:#1e2228;--om-card:#21262d;--om-card-raised:#282d35;--om-inset:#1a1e24;--om-sidebar:#1a2030;--om-titlebar:#1a2a3a;--om-statusbar:#1a2a3a;--om-dialog:#1e2535;--om-terminal:#11151a;
+/* neutral ramp */
+--om-gray-700:#2d333b;--om-gray-600:#373d45;--om-gray-500:#444c56;--om-gray-400:#5a6270;--om-gray-300:#6b778c;--om-gray-200:#8b929a;--om-gray-150:#b0b8c4;--om-gray-100:#c8cdd3;--om-gray-50:#d4d8dd;--om-gray-25:#e0e4e8;
+/* text */
+--om-text:#d4d8dd;--om-text-strong:#e0e4e8;--om-text-muted:#8b929a;--om-text-label:#b0b8c4;--om-text-value:#c8cdd3;--om-text-placeholder:#5a6270;
+--om-on-dark-90:rgba(255,255,255,.9);--om-on-dark-70:rgba(255,255,255,.7);--om-on-dark-45:rgba(255,255,255,.45);--om-on-dark-40:rgba(255,255,255,.4);--om-on-dark-25:rgba(255,255,255,.25);
+--om-white-04:rgba(255,255,255,.04);--om-white-06:rgba(255,255,255,.06);--om-white-08:rgba(255,255,255,.08);--om-white-10:rgba(255,255,255,.1);--om-white-15:rgba(255,255,255,.15);
+/* borders */
+--om-border:#373d45;--om-border-subtle:rgba(255,255,255,.06);--om-border-hover:#5b9bd5;
+/* brand */
+--om-mint:#6dd4a0;--om-mint-hover:#5bc08c;--om-mint-tint:rgba(109,212,160,.08);--om-mint-tint-strong:rgba(109,212,160,.12);--om-mint-deep:#4fa077;
+--om-green:#3cc77a;--om-teal:#2dd4bf;--om-teal-tint:rgba(45,212,191,.15);--om-teal-btn:#0f8a7e;--om-teal-btn-hover:#0d9488;
+--om-blue:#5b9bd5;--om-blue-hover:#4a8bc4;--om-blue-action:#4a90e2;--om-blue-action-hover:#357abd;
+--om-indigo:#818cf8;--om-slate:#94a3b8;
+/* semantic */
+--om-success:#3cc77a;--om-warning:#e5a830;--om-danger:#e06060;--om-danger-hover:#c04040;
+/* tonal badge pairs */
+--om-tone-blue-bg:#1e2a3a;--om-tone-blue-fg:#7eb8e5;
+--om-tone-eval-bg:#1a2c40;--om-tone-eval-fg:#70b0e0;
+--om-tone-yellow-bg:#3a3520;--om-tone-yellow-fg:#e5c46a;--om-tone-yellow-border:#5a4d20;
+--om-tone-orange-bg:#3a2e1e;--om-tone-orange-fg:#e5a860;--om-tone-orange-border:#5a4430;
+--om-tone-red-bg:#3a2020;--om-tone-red-fg:#f0a0a0;--om-tone-red-border:#5a3030;
+--om-tone-green-bg:#1a3a24;--om-tone-green-fg:#6ae08a;
+--om-tone-neutral-bg:#373d45;--om-tone-neutral-fg:#b0b8c4;
+/* ticket action fills */
+--om-btn-start:#1a7a4a;--om-btn-start-hover:#1f8c56;--om-btn-approve:#1a8a4a;--om-btn-approve-hover:#1f9a56;--om-btn-reject:#c04040;--om-btn-reject-hover:#d04848;--om-btn-cancel:#6b5a3a;--om-btn-cancel-hover:#7a6844;--om-btn-cancel-fg:#e0d8c8;
+/* window chrome */
+--om-mac-close:#ff5f57;--om-mac-min:#febc2e;--om-mac-max:#28c840;--om-win-close-hover:#e81123;
+/* marketing gallery */
+--om-mkt-bg:#17191d;--om-mkt-panel:#202329;--om-mkt-border:#353a42;--om-mkt-headline:#dfe2e6;--om-mkt-sub:#aab1ba;--om-mkt-accent:#3cc77a;--om-mkt-on-accent:#0f2418;
+/* semantic aliases */
+--surface-app:var(--om-bg);--surface-board:var(--om-surface);--surface-card:var(--om-card);--surface-ticket:var(--om-card-raised);--surface-input:var(--om-bg);--surface-inset:var(--om-inset);--surface-sidebar:var(--om-sidebar);
+--text-body:var(--om-text);--text-heading:var(--om-text);--text-subtle:var(--om-text-muted);--text-link:var(--om-blue);
+--accent:var(--om-mint);--accent-active-bg:var(--om-mint-tint);--focus-ring:var(--om-teal);
+}
+/* Light theme (still shipped by the app; dark is default). */
+[data-theme="light"]{
+--om-bg:#ffffff;--om-surface:#f5f7fa;--om-card:#ffffff;--om-card-raised:#ffffff;--om-inset:#f4f5f7;--om-titlebar:#2c6aad;--om-statusbar:#f4f5f7;
+--om-text:#2c3e50;--om-text-strong:#172b4d;--om-text-muted:#6b778c;--om-text-label:#44546f;--om-text-value:#172b4d;--om-border:#e1e4e8;
+--om-blue:#4a90e2;--om-success:#2ecc71;--om-warning:#f39c12;--om-danger:#e74c3c;--om-teal:#0d9488;
+--om-tone-blue-bg:#e6f0ff;--om-tone-blue-fg:#3451a3;--om-tone-yellow-bg:#fff3cd;--om-tone-yellow-fg:#856404;--om-tone-red-bg:#fde8ea;--om-tone-red-fg:#7f1d1d;--om-tone-green-bg:#dcfce7;--om-tone-green-fg:#166534;--om-tone-neutral-bg:#e1e4e8;--om-tone-neutral-fg:#44546f;
+--om-btn-start:#1f845a;--om-btn-start-hover:#196946;--om-btn-approve:#2ecc71;--om-btn-approve-hover:#27ae60;--om-btn-reject:#e74c3c;--om-btn-reject-hover:#cb4335;--om-btn-cancel:#c9a86c;--om-btn-cancel-hover:#b8956a;--om-btn-cancel-fg:#ffffff;
+}
