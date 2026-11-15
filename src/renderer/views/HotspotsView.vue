@@ -13,6 +13,7 @@ import { sevOf, tabs } from '../lib/viewHelpers.js';
 import { buildTreemap } from '../lib/treemap.js';
 import OmButton from '../components/ds/OmButton.vue';
 import OmBadge from '../components/ds/OmBadge.vue';
+import OmPrototypeBanner from '../components/ds/OmPrototypeBanner.vue';
 
 const store = useInsightStore();
 const S = store.state;
@@ -86,6 +87,7 @@ const hs = computed(() => {
     </div>
     <select class="om-select om-select--md"><option>Last 90 days</option><option>Last 12 months</option><option>All time</option></select>
   </div>
+  <OmPrototypeBanner />
   <div style="flex:1;min-height:0;display:flex">
     <div style="flex:1;min-width:0;display:flex;flex-direction:column;padding:14px 16px;gap:10px">
       <div style="flex:1;min-height:0;position:relative;background:var(--om-inset);border-radius:6px;overflow:hidden">

@@ -7,6 +7,7 @@ import { SEV } from '../lib/constants.js';
 import { sevOf } from '../lib/viewHelpers.js';
 import { hash, rng } from '../lib/random.js';
 import OmBadge from '../components/ds/OmBadge.vue';
+import OmPrototypeBanner from '../components/ds/OmPrototypeBanner.vue';
 
 const store = useInsightStore();
 const S = store.state;
@@ -113,6 +114,7 @@ const gh = computed(() => {
     <select class="om-select om-select--md"><option>All authors</option><option>m.okafor</option><option>j.lindqvist</option><option>p.nair</option></select>
     <select class="om-select om-select--md"><option>Last 90 days</option><option>Last 12 months</option><option>All time</option></select>
   </div>
+  <OmPrototypeBanner />
   <div style="flex:1;min-height:0;display:flex">
     <div style="flex:1;min-width:0;overflow:auto;padding:16px 20px;display:flex;flex-direction:column;gap:14px">
       <div style="background:var(--om-card);border:1px solid var(--om-border);border-radius:8px;padding:12px 16px;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:16px">

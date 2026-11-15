@@ -5,6 +5,7 @@ import { useInsightStore } from '../stores/insightStore.js';
 import { SEV } from '../lib/constants.js';
 import { sevOf } from '../lib/viewHelpers.js';
 import OmBadge from '../components/ds/OmBadge.vue';
+import OmPrototypeBanner from '../components/ds/OmPrototypeBanner.vue';
 import {
   FILES, QUALITY_TABS, QUALITY_STATS, QUALITY_CLONES, QUALITY_UNUSED_EXP, QUALITY_UNREF_FILES, QUALITY_UNUSED_FNS,
   QUALITY_TYPE_ROWS, QUALITY_TYPE_TILES, QUALITY_OTHER_LANGS, QUALITY_DOC_ROWS, QUALITY_LOW_COMMENT,
@@ -46,6 +47,7 @@ const q = computed(() => {
 
 <template>
   <div style="display:flex;align-items:center;gap:12px;padding:10px 20px;border-bottom:1px solid var(--om-border);flex-shrink:0;flex-wrap:wrap"><div style="display:flex;flex-direction:column;gap:2px;margin-right:auto"><div style="font-size:1.05rem;font-weight:600;color:var(--om-text-strong)">Code Quality</div><div style="font-family:var(--font-mono);font-size:.7rem;color:var(--om-text-muted)">Duplication · dead code · type safety · documentation · tests</div></div></div>
+  <OmPrototypeBanner />
   <div style="flex:1;overflow:auto;padding:16px 20px;display:flex;flex-direction:column;gap:14px">
     <div style="flex-shrink:0;background:var(--om-card);border:1px solid var(--om-border);border-radius:8px;padding:12px 16px;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:14px">
       <div v-for="s in q.stats" :key="s.k" style="display:flex;flex-direction:column;gap:1px;border-left:1px solid var(--om-border);padding-left:12px;min-width:0"><span style="font-size:.58rem;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--om-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ s.k }}</span><span style="font-family:var(--font-mono);font-size:1.05rem;color:var(--om-text-strong)">{{ s.v }}</span><span style="font-size:.6rem;color:var(--om-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ s.sub }}</span></div>

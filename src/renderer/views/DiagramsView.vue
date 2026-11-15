@@ -6,6 +6,7 @@ import { useInsightStore } from '../stores/insightStore.js';
 import { DIAGRAMS, BOXES, SEQS } from '@/data/insightData.js';
 import { tabs } from '../lib/viewHelpers.js';
 import OmButton from '../components/ds/OmButton.vue';
+import OmPrototypeBanner from '../components/ds/OmPrototypeBanner.vue';
 
 const store = useInsightStore();
 const S = store.state;
@@ -80,6 +81,7 @@ const svgStyle = { position: 'absolute', left: 0, top: 0, overflow: 'visible', p
 </script>
 
 <template>
+  <OmPrototypeBanner />
   <div style="flex:1;min-height:0;display:flex">
     <div style="width:260px;flex-shrink:0;border-right:1px solid var(--om-border);background:var(--om-surface);display:flex;flex-direction:column;min-height:0">
       <div style="padding:12px 14px;border-bottom:1px solid var(--om-border);display:flex;align-items:center;justify-content:space-between">

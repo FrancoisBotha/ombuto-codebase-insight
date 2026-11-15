@@ -7,6 +7,7 @@ import { useInsightStore } from '../stores/insightStore.js';
 import { MODS, EDGES, CLUSTERS, MODSUM, CLS, C4, C4E } from '@/data/insightData.js';
 import { seg, tabs } from '../lib/viewHelpers.js';
 import OmBadge from '../components/ds/OmBadge.vue';
+import OmPrototypeBanner from '../components/ds/OmPrototypeBanner.vue';
 
 const store = useInsightStore();
 const S = store.state;
@@ -115,6 +116,7 @@ const svgStyle = { position: 'absolute', left: 0, top: 0, overflow: 'visible', p
       <button v-for="m in ar.viewTabs" :key="m.id" @click="m.pick" :style="{ border: 'none', fontFamily: 'inherit', fontSize: '.74rem', fontWeight: 500, padding: '5px 12px', borderRadius: '4px', cursor: 'pointer', background: m.bg, color: m.fg, whiteSpace: 'nowrap' }">{{ m.label }}</button>
     </div>
   </div>
+  <OmPrototypeBanner />
   <div style="flex:1;min-height:0;display:flex">
     <div style="flex:1;min-width:0;position:relative;overflow:hidden;background:var(--om-inset)">
       <div style="position:absolute;left:12px;top:12px;z-index:5;display:flex;gap:6px;flex-wrap:wrap">

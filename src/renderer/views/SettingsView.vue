@@ -10,6 +10,7 @@ import {
 } from '../data/insightData.js';
 import OmButton from '../components/ds/OmButton.vue';
 import OmBadge from '../components/ds/OmBadge.vue';
+import OmPrototypeBanner from '../components/ds/OmPrototypeBanner.vue';
 
 const store = useInsightStore();
 const S = store.state;
@@ -120,6 +121,7 @@ const knobStyle = (t) => ({ position: 'absolute', top: '2px', left: t.kl, width:
       <div style="font-size:1.25rem;font-weight:600;color:var(--om-text-strong)">Settings</div>
       <div style="display:flex;flex-direction:column;gap:12px">
         <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:.95rem;font-weight:600;color:var(--om-text-strong)">LLM Provider</span><span style="font-size:.76rem;color:var(--om-text-muted)">Used for summaries, Q&amp;A, tours and explanations. Deterministic analysis never uses an LLM.</span></div>
+        <OmPrototypeBanner style="border-radius:6px;border-bottom:none" />
         <div style="display:flex;align-items:flex-end;border-bottom:1px solid var(--om-border);gap:4px">
           <button v-for="c in st.cards" :key="c.id" @click="c.pick" v-hover="'color:var(--om-text-strong)'" :style="{ display: 'flex', alignItems: 'center', gap: '7px', border: 'none', background: 'transparent', fontFamily: 'inherit', fontSize: '.8rem', fontWeight: 500, padding: '9px 14px 8px', cursor: 'pointer', color: c.fg, borderBottom: '2px solid ' + c.bd, marginBottom: '-1px', whiteSpace: 'nowrap' }">
             <span :class="'mdi mdi-' + c.ic"></span>{{ c.t }}<span title="Active provider" :style="{ width: '6px', height: '6px', borderRadius: '50%', background: c.dot }"></span>
@@ -211,6 +213,7 @@ const knobStyle = (t) => ({ position: 'absolute', top: '2px', left: t.kl, width:
 
       <div style="display:flex;flex-direction:column;gap:12px">
         <span style="font-size:.95rem;font-weight:600;color:var(--om-text-strong)">Analysis</span>
+        <OmPrototypeBanner style="border-radius:6px;border-bottom:none" />
         <div style="background:var(--om-card);border:1px solid var(--om-border);border-radius:8px">
           <div style="padding:12px 14px;border-bottom:1px solid var(--om-border);display:flex;flex-direction:column;gap:8px">
             <span style="font-size:.66rem;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--om-text-muted)">Ignored Paths</span>

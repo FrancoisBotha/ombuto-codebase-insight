@@ -5,6 +5,7 @@ import { useInsightStore } from '../stores/insightStore.js';
 import { tabs } from '../lib/viewHelpers.js';
 import { FILES, REPORT_BADGES, REPORT_SECTIONS, REPORT_SUBSCORES, REPORT_EXPORTS } from '../data/insightData.js';
 import OmButton from '../components/ds/OmButton.vue';
+import OmPrototypeBanner from '../components/ds/OmPrototypeBanner.vue';
 
 const store = useInsightStore();
 const S = store.state;
@@ -58,6 +59,7 @@ const rp = computed(() => {
     </div>
     <OmButton v-for="x in rp.exp" :key="x.l" variant="secondary" :icon="x.ic" @click="x.run">{{ x.l }}</OmButton>
   </div>
+  <OmPrototypeBanner />
   <div style="flex:1;min-height:0;display:flex">
     <div style="width:340px;flex-shrink:0;border-right:1px solid var(--om-border);background:var(--om-surface);overflow:auto;padding:16px;display:flex;flex-direction:column;gap:18px">
       <div style="display:flex;flex-direction:column;gap:6px">

@@ -10,6 +10,7 @@ import { SEV } from '../lib/constants.js';
 import { buildTreemap } from '../lib/treemap.js';
 import OmButton from '../components/ds/OmButton.vue';
 import OmBadge from '../components/ds/OmBadge.vue';
+import OmPrototypeBanner from '../components/ds/OmPrototypeBanner.vue';
 
 const store = useInsightStore();
 const S = store.state;
@@ -64,6 +65,7 @@ const reanalyse = () => store.go('indexing', { t: 0 });
     </div>
     <OmButton variant="secondary" icon="export-variant" @click="goReport">Share</OmButton>
   </div>
+  <OmPrototypeBanner />
 
   <div v-if="ov.loaded" style="flex:1;overflow:auto;padding:16px 20px;display:flex;flex-direction:column;gap:14px">
     <div style="background:var(--om-card);border:1px solid var(--om-border);border-radius:8px;padding:12px 16px;display:grid;grid-template-columns:minmax(220px,1.6fr) repeat(6,minmax(0,1fr));gap:16px;align-items:center">

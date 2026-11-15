@@ -4,6 +4,7 @@ import { computed, ref, watch, nextTick } from 'vue';
 import { useInsightStore } from '../stores/insightStore.js';
 import OmButton from '../components/ds/OmButton.vue';
 import CodeView from '../components/CodeView.vue';
+import OmPrototypeBanner from '../components/ds/OmPrototypeBanner.vue';
 import { SNIPS, CITES, ANSWER, ANSWER2, STARTERS, OR_DEF, ASK_Q0, ASK_THINKING_STEPS, ASK_FOLLOWUPS } from '../data/insightData.js';
 
 const store = useInsightStore();
@@ -81,6 +82,7 @@ watch(
 </script>
 
 <template>
+  <OmPrototypeBanner />
   <div style="flex:1;min-height:0;display:flex">
     <div style="flex:1.15;min-width:0;display:flex;flex-direction:column;min-height:0">
       <div style="display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid var(--om-border)">

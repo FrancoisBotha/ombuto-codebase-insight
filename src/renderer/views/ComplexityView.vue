@@ -10,6 +10,7 @@ import { SEV } from '../lib/constants.js';
 import { tabs } from '../lib/viewHelpers.js';
 import OmButton from '../components/ds/OmButton.vue';
 import OmBadge from '../components/ds/OmBadge.vue';
+import OmPrototypeBanner from '../components/ds/OmPrototypeBanner.vue';
 
 const store = useInsightStore();
 const S = store.state;
@@ -91,6 +92,7 @@ const GRID = 'minmax(0,1.2fr) minmax(0,1.2fr) 110px 40px 40px 46px 34px 40px 50p
       <button v-for="m in cx.thTabs" :key="m.id" @click="m.pick" :style="{ border: 'none', fontFamily: 'var(--font-mono)', fontSize: '.72rem', fontWeight: 500, padding: '4px 10px', borderRadius: '4px', cursor: 'pointer', background: m.bg, color: m.fg }">{{ m.label }}</button>
     </div>
   </div>
+  <OmPrototypeBanner />
   <div style="flex:1;overflow:auto;padding:16px 20px;display:flex;flex-direction:column;gap:14px">
     <div style="flex-shrink:0;background:var(--om-card);border:1px solid var(--om-border);border-radius:8px;padding:12px 16px;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:16px">
       <div v-for="s in cx.stats" :key="s.k" style="display:flex;flex-direction:column;gap:1px;border-left:1px solid var(--om-border);padding-left:14px;min-width:0">

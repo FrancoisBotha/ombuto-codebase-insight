@@ -4,6 +4,7 @@ import { computed } from 'vue';
 import { useInsightStore } from '../stores/insightStore.js';
 import { SEV, VSEV, STAT } from '../lib/constants.js';
 import OmBadge from '../components/ds/OmBadge.vue';
+import OmPrototypeBanner from '../components/ds/OmPrototypeBanner.vue';
 import { DEPS, DEPS_VULN_RANK } from '../data/insightData.js';
 
 const store = useInsightStore();
@@ -66,6 +67,7 @@ const GRID = 'minmax(140px,1.3fr) 80px 80px 120px minmax(200px,2fr) minmax(110px
       <div style="display:flex;flex-direction:column;align-items:flex-end"><span style="font-family:var(--font-mono);font-size:1rem;color:var(--om-text-strong)">7</span><span style="font-size:.6rem;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--om-text-muted)">Major Behind</span></div>
     </div>
   </div>
+  <OmPrototypeBanner />
   <div style="display:flex;align-items:center;gap:8px;padding:10px 20px;border-bottom:1px solid var(--om-border);flex-wrap:wrap">
     <div style="position:relative;width:240px"><span class="mdi mdi-magnify" style="position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--om-text-muted)"></span><input class="om-input" :value="S.depQ" @input="onQ" placeholder="Filter packages" style="padding-left:28px;padding-top:5px;padding-bottom:5px;font-size:.78rem"></div>
     <button v-for="f in dp.filters" :key="f.k" @click="f.pick" :style="{ display: 'flex', alignItems: 'center', gap: '6px', fontFamily: 'inherit', fontSize: '.72rem', fontWeight: 500, padding: '4px 10px', borderRadius: '999px', cursor: 'pointer', background: f.bg, color: f.fg, border: '1px solid ' + f.bd }">{{ f.l }}<span style="font-family:var(--font-mono);font-size:.64rem;opacity:.75">{{ f.n }}</span></button>
