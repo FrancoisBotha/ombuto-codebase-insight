@@ -6,7 +6,8 @@ macOS or Linux.
 
 ## 1. Stack and frameworks
 - Language and version: JavaScript (ES modules, `"type": "module"`), no TypeScript.
-  Node.js >= 22 for tooling. The app itself runs on Electron 45's bundled Node (24.x).
+  Node.js 24 LTS for tooling (`.nvmrc`; `nvm use 24.22.3`). The app itself
+  runs on Electron 45's bundled Node (24.x).
 - App frameworks: Electron 45 (main process + `utilityProcess` pipeline worker +
   sandboxed preload), Vue 3 + Pinia renderer built by Vite 8.
 - Test framework(s): Vitest 4. Vue components are tested with `@vue/test-utils`
@@ -27,6 +28,11 @@ macOS or Linux.
 - Vitest picks up `tests/**/*.test.js` (see `vitest.config.js`).
 - Current scaffold tests: `tests/unit/ipcChannels.test.js`,
   `tests/unit/App.test.js`, `tests/unit/sqlite.smoke.test.js`.
+- Guard tests (keep them passing; run them when you touch what they guard):
+  - `tests/unit/schema.test.js`: `docs/Data Model/Schema.ddl` executes, keeps
+    the layer rules, and stays parseable by the ER viewer.
+  - `tests/unit/grammars.smoke.test.js`: every vendored grammar in
+    `resources/grammars/` loads and parses.
 
 ## 3. How to run tests for a specific file or test class
 ```bash
@@ -99,8 +105,20 @@ These belong in integration or regression tests, or in manual verification.
   unless `VITE_DEV_SERVER_URL` is set; a stale `dist/` shows an old UI.
 - **Renderer has no Node.** Anything needing the filesystem, git or SQLite goes
   through IPC to main (reads) or the worker (writes), never the renderer.
-- **Node 25 on the dev machine** triggers harmless `EBADENGINE` warnings from
-  some transitive tooling; Node 22/24 LTS avoids them.
+- **Schema changes touch `docs/Data Model/Schema.ddl` in the same ticket**
+  (see CLAUDE.md). Any ticket that changes tables, columns or indexes runs
+  `npx vitest run tests/unit/schema.test.js` in its build phase.
+- **Grammars are vendored `.wasm` files**, not npm dependencies. Load them
+  from `resources/grammars/` via `grammars.json`. Rebuilding the SQL grammar
+  (`npm run vendor:grammars -- --sql`) downloads about 700 MB of toolchain on
+  first run; nothing else needs it.
+- **`overrides` in `package.json`** forces patched `glob`/`editorconfig`
+  under `js-beautify` (pulled in by `@vue/test-utils`). Remove it once
+  `@vue/test-utils` ships a release with patched dependencies; don't delete
+  it just because it looks odd.
+- **Use Node 24 LTS** (`.nvmrc`). Odd-numbered Node releases (e.g. 25) cause
+  `EBADENGINE` warnings and can produce a lockfile that `npm ci` on Node 24
+  rejects.
 
 ## 10. Phase gates — what each agent runs
 

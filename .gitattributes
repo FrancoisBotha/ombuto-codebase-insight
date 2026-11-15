@@ -21,3 +21,4 @@
 *.dll  binary
 *.pdb  binary
 *.db   binary
+*.wasm binary

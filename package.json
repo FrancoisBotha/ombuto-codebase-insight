@@ -6,7 +6,7 @@
   "type": "module",
   "main": "src/main/main.js",
   "engines": {
-    "node": ">=22"
+    "node": "^24.11.0"
   },
   "scripts": {
     "dev": "vite",
@@ -14,7 +14,8 @@
     "start": "npm run build && electron .",
     "electron:dev": "concurrently -k -n vite,electron \"vite\" \"wait-on tcp:127.0.0.1:5175 && cross-env VITE_DEV_SERVER_URL=http://127.0.0.1:5175 electron .\"",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "vendor:grammars": "node scripts/vendor-grammars.mjs"
   },
   "repository": {
     "type": "git",
@@ -56,5 +57,11 @@
     "vite": "^8.3.8",
     "vitest": "^4.1.12",
     "wait-on": "^9.5.1"
+  },
+  "overrides": {
+    "js-beautify": {
+      "glob": "^14.0.6",
+      "editorconfig": "^4.0.1"
+    }
   }
 }
