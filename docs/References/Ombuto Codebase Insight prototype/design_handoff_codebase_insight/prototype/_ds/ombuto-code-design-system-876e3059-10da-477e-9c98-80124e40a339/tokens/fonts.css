@@ -1,0 +1,5 @@
+/* Roboto is the app font (index.html loads it from Google Fonts, weights 300/400/500/700).
+   Roboto Mono is a substitute for the marketing eyebrow/mono face and the app's
+   system mono stack (SFMono-Regular, Consolas, Menlo). Material Design Icons via CDN, as in the app. */
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500;700&display=swap");
+@import url("https://cdn.jsdelivr.net/npm/@mdi/font@6.9.96/css/materialdesignicons.min.css");
