@@ -1,15 +1,17 @@
 // The renderer's single data seam. Every view reads its data from here and
-// nowhere else. Welcome and Indexing (epic 1 FR-001..FR-004, FR-006) are real:
-// their exports call the preload bridge (window.insight.*, read-only IPC against
-// main and the per-repo insight.db). The other screens still re-export sample
-// data from src/renderer/mock/ until their tickets wire them. See
+// nowhere else. Welcome and Indexing (epic 1 FR-001..FR-004, FR-006) and Size &
+// Inventory / Files (FR-007, FR-008) are real: their exports call the preload
+// bridge (window.insight.*, read-only IPC against main and the per-repo
+// insight.db). The other screens still re-export sample data from
+// src/renderer/mock/ until their tickets wire them. See
 // docs/Architecture/prototype-port.md.
 
-// --- Welcome + Indexing: IPC through the preload bridge ------------------------
 // Every helper tolerates a missing bridge (unit tests, a plain browser tab in
-// dev) by resolving to an empty/"not available" value instead of throwing.
-
+// dev, no repository open) by resolving to an empty/"not available" value
+// instead of throwing.
 const bridge = () => (typeof window !== 'undefined' && window.insight) || null;
+
+// --- Welcome + Indexing: IPC through the preload bridge ------------------------
 
 const NO_BRIDGE = 'The application bridge is not available in this window.';
 
@@ -52,7 +54,6 @@ export const onRunEvent = (callback) => bridge()?.run?.onEvent(callback) ?? (() 
 // --- Screens still on sample data ---------------------------------------------
 export * from '../mock/harborApi.js';
 export * from '../mock/screens/overview.js';
-export * from '../mock/screens/inventory.js';
 export * from '../mock/screens/architecture.js';
 export * from '../mock/screens/complexity.js';
 export * from '../mock/screens/quality.js';
@@ -61,6 +62,40 @@ export * from '../mock/screens/hotspots.js';
 export * from '../mock/screens/history.js';
 export * from '../mock/screens/ask.js';
 export * from '../mock/screens/diagrams.js';
-export * from '../mock/screens/file.js';
 export * from '../mock/screens/report.js';
 export * from '../mock/screens/settings.js';
+
+// --- Size & Inventory and Files: read-only IPC (FR-007, FR-008) ----------------
+// Each call degrades to an empty result when the bridge is absent, so the views
+// render their empty states instead of throwing.
+
+/**
+ * Size & Inventory aggregates for the open repository's HEAD, or null.
+ * @param {{largestLimit?: number, folderDepth?: number, folderLimit?: number}} [options]
+ */
+export async function fetchInventory(options) {
+  const api = bridge()?.inventory;
+  if (!api) return null;
+  return (await api.summary(options)) ?? null;
+}
+
+/** The explorer tree ({ commitSha, fileCount, children }) for HEAD, or null. */
+export async function fetchFileTree() {
+  const api = bridge()?.files;
+  if (!api) return null;
+  return (await api.tree()) ?? null;
+}
+
+/** One tracked file with its content (null content for binary files), or null. */
+export async function fetchFileContent(filePath) {
+  const api = bridge()?.files;
+  if (!api) return null;
+  return (await api.content(filePath)) ?? null;
+}
+
+/** Path search for the command palette's Files group. */
+export async function searchFiles(query, limit = 5) {
+  const api = bridge()?.files;
+  if (!api) return [];
+  return (await api.search(query, limit)) ?? [];
+}

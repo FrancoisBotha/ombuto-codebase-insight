@@ -23,6 +23,8 @@ const LATE_KEYS = [
   'cli', 'cxF', 'cxSel', 'cxTh', 'fsel', 'gMain', 'gsel', 'mdlg', 'mfilter', 'mq', 'msort',
   'orCleared', 'orDefault', 'orInput', 'orModels', 'orVals', 'ptab', 'qtab', 'tbColor', 'tg',
   'topen', 'tq', 'unitLang',
+  // Not from the prototype: the palette's Files group, filled from files:search (FR-008).
+  'palFiles',
 ];
 
 // The prototype's dev-only "Tweaks" props. In dev builds they can be set with

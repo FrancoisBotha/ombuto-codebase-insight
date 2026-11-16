@@ -1,8 +1,32 @@
 // Command palette items (prototype: Component.palItems), shared by the palette
-// overlay and the global keyboard handler.
+// overlay and the global keyboard handler. The Files group lists real tracked
+// paths from the files:search IPC query (FR-008); the overlay refreshes them
+// with refreshPaletteFiles() as the query changes and keeps them in
+// state.palFiles so palItems() stays synchronous.
 import { NAV } from './constants.js';
-import { FILES } from '../data/insightData.js';
+import { searchFiles } from '../data/insightData.js';
 import { useRepoStore } from '../stores/repoStore.js';
+
+export const PALETTE_FILE_LIMIT = 5;
+
+let searchSeq = 0;
+
+/** Re-runs the path search for the current query; stale responses are dropped. */
+export async function refreshPaletteFiles(store) {
+  const q = (store.state.q || '').trim();
+  const seq = ++searchSeq;
+  if (!q) {
+    store.setState({ palFiles: [] });
+    return;
+  }
+  let files = [];
+  try {
+    files = await searchFiles(q, PALETTE_FILE_LIMIT);
+  } catch {
+    files = [];
+  }
+  if (seq === searchSeq) store.setState({ palFiles: files });
+}
 
 export function palItems(store) {
   const S = store.state;
@@ -23,8 +47,8 @@ export function palItems(store) {
     { label: 'Open repository…', icon: 'folder-open-outline', hint: '⌘O', run: () => go('welcome') },
     { label: 'Toggle navigation drawer', icon: 'dock-left', hint: '⌘B', run: () => store.setState((s) => ({ pal: false, collapsed: !s.collapsed })) },
   ].filter((i) => m(i.label));
-  const files = FILES.filter((f) => q && m(f.path))
-    .slice(0, 5)
+  const files = (q ? S.palFiles || [] : [])
+    .slice(0, PALETTE_FILE_LIMIT)
     .map((f) => ({ label: f.path, icon: 'file-code-outline', hint: '', mono: true, run: () => go('file', { fsel: f.path, sel: f.path }) }));
   if (files.length) out.push({ header: 'Files' }, ...files);
   if (act.length) out.push({ header: 'Actions' }, ...act);

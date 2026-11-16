@@ -8,10 +8,10 @@
 import { onMounted, onBeforeUnmount, ref, watch } from 'vue';
 import { EditorState, RangeSetBuilder } from '@codemirror/state';
 import { EditorView, lineNumbers, gutter, GutterMarker, Decoration, ViewPlugin } from '@codemirror/view';
-import { javascript } from '@codemirror/lang-javascript';
 import { HighlightStyle, syntaxHighlighting } from '@codemirror/language';
 import { tags as t } from '@lezer/highlight';
 import { HEAT, ramp } from '../lib/color.js';
+import { languageExtension } from '../lib/codeLanguage.js';
 
 const props = defineProps({
   code: { type: String, default: '' },
@@ -19,8 +19,10 @@ const props = defineProps({
   variant: { type: String, default: 'ask' }, // 'ask' | 'file'
   hlA: { type: Number, default: 0 },
   hlB: { type: Number, default: 0 },
-  /** (lineNo) => age in days, for the blame strip (variant "file"). */
+  /** (lineNo) => age in days, for the blame strip (variant "file"); null = no blame yet. */
   blame: { type: Function, default: null },
+  /** raw_blob.language id (see lib/codeLanguage.js); unknown ids render as plain text. */
+  language: { type: String, default: 'typescript' },
 });
 
 const host = ref(null);
@@ -42,6 +44,7 @@ function heatOf(line) {
   return line.trim() ? Math.min(8, br * 2 + Math.max(0, ind - 1)) : 0;
 }
 function ageBg(age) {
+  if (age === null) return 'var(--om-inset)'; // no blame data yet (git history arrives in a later epic)
   return age < 7 ? '#6dd4a0' : age < 60 ? '#4fa077' : age < 365 ? '#444c56' : '#2d333b';
 }
 
@@ -66,7 +69,7 @@ class AgeMarker extends GutterMarker {
     const el = document.createElement('span');
     el.className = 'cv-age-bar';
     el.style.background = ageBg(this.age);
-    el.title = this.age ? (this.age < 1 ? 'today' : this.age + ' days ago') : '';
+    el.title = this.age === null ? 'Blame not analysed yet' : this.age ? (this.age < 1 ? 'today' : this.age + ' days ago') : '';
     return el;
   }
 }
@@ -125,7 +128,7 @@ function extensions() {
   const ext = [
     EditorState.readOnly.of(true),
     EditorView.editable.of(false),
-    javascript({ typescript: true }),
+    languageExtension(props.language) ?? [],
     syntaxHighlighting(highlight),
     theme(props.variant),
     lineNumbers({ formatNumber: (n) => String(n + props.start - 1) }),
@@ -133,7 +136,7 @@ function extensions() {
   if (props.variant === 'file') {
     ext.push(
       gutter({ class: 'cv-heat', lineMarker: (v, line) => new HeatMarker(heatOf(v.state.doc.sliceString(line.from, line.to))) }),
-      gutter({ class: 'cv-age', lineMarker: (v, line) => new AgeMarker(props.blame ? props.blame(lineNo(v, line.from)) : 0) }),
+      gutter({ class: 'cv-age', lineMarker: (v, line) => new AgeMarker(props.blame ? props.blame(lineNo(v, line.from)) : null) }),
     );
   } else {
     ext.push(citeHighlight());
@@ -147,7 +150,7 @@ function mount() {
 }
 
 onMounted(mount);
-watch(() => [props.code, props.start, props.hlA, props.hlB, props.blame, props.variant], mount);
+watch(() => [props.code, props.start, props.hlA, props.hlB, props.blame, props.variant, props.language], mount);
 onBeforeUnmount(() => view?.destroy());
 </script>
 

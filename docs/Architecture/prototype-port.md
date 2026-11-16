@@ -73,7 +73,7 @@ src/renderer/
 | Welcome (`is.welcome`) | `views/WelcomeView.vue` (real data since OPINV-006; `mock/screens/welcome.js` deleted) |
 | Indexing (`is.indexing`) | `views/IndexingView.vue` (real data since OPINV-006; `mock/screens/indexing.js` deleted) |
 | Overview (`is.overview`, 4 view states) | `views/OverviewView.vue`, `mock/screens/overview.js` |
-| Size & Inventory (`is.inventory`) | `views/InventoryView.vue`, `mock/screens/inventory.js` |
+| Size & Inventory (`is.inventory`) | `views/InventoryView.vue` (on `inventory:summary` IPC since OPINV-007; its mock was deleted) |
 | Architecture (`is.architecture`) | `views/ArchitectureView.vue` |
 | Complexity (`is.complexity`) | `views/ComplexityView.vue`, `mock/screens/complexity.js` |
 | Code Quality (`is.quality`) | `views/QualityView.vue`, `mock/screens/quality.js` |
@@ -82,7 +82,7 @@ src/renderer/
 | Commit History (`is.history`) | `views/HistoryView.vue`, `mock/screens/history.js` |
 | Ask the Codebase (`is.ask`) | `views/AskView.vue`, `mock/screens/ask.js` |
 | Diagrams (`is.diagrams`) | `views/DiagramsView.vue` |
-| Files (`is.file`) | `views/FileView.vue`, `mock/screens/file.js` |
+| Files (`is.file`) | `views/FileView.vue` (on `files:tree` / `files:content` IPC since OPINV-007; its mock was deleted), `lib/codeLanguage.js` (CodeMirror mode by `raw_blob.language`) |
 | Share Report (`is.report`) | `views/ReportView.vue`, `mock/screens/report.js` |
 | Settings (`is.settings`) + OpenRouter model dialog (`st.or.dlg`) | `views/SettingsView.vue` (dialog teleported to `#om-root`), `mock/screens/settings.js` |
 | Constants `AUTHORS`…`COMMITS` (sample data) | `mock/harborApi.js` (verbatim, `export` added) |
@@ -203,7 +203,11 @@ Each item is intentional. The reason is the constraint that forced it.
 ## Known gaps / suggested follow-up tickets
 
 - Replace `data/insightData.js` exports with read-only IPC queries backed by `insight.db`
-  (screen by screen), and delete the corresponding `mock/` files.
+  (screen by screen), and delete the corresponding `mock/` files. Done for Size &
+  Inventory, Files and the palette's Files group (OPINV-007): their side panels and
+  parser-derived cells show "Not analysed yet" until the owning epic wires them, the
+  Files blame strip is neutral until git history exists, and `Open in Editor` only
+  toasts (opening untrusted repo files needs its own ticket).
 - Lay out the module graph with elkjs once real module data exists.
 - Real "Open Folder…" (native dialog via main process) and drag-and-drop on Welcome.
 - Decide whether ⌘E / ⌘J / ⌘R should be wired (product decision; unwired in the prototype).

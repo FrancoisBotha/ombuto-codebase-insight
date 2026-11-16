@@ -2,7 +2,7 @@
 // ⌘K command palette overlay (prototype lines 1752–1776).
 import { computed, ref, watch, nextTick } from 'vue';
 import { useInsightStore } from '../../stores/insightStore.js';
-import { palItems } from '../../lib/palette.js';
+import { palItems, refreshPaletteFiles } from '../../lib/palette.js';
 
 const store = useInsightStore();
 const S = store.state;
@@ -33,6 +33,13 @@ const close = () => store.setState({ pal: false });
 watch(
   () => S.pal,
   (open) => open && setTimeout(() => nextTick(() => input.value?.focus()), 30),
+  { immediate: true },
+);
+
+// The Files group searches real paths over IPC as the query changes (FR-008).
+watch(
+  () => [S.pal, S.q],
+  ([open]) => { if (open) refreshPaletteFiles(store); },
   { immediate: true },
 );
 </script>
