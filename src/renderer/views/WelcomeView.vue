@@ -1,23 +1,39 @@
 <script setup>
-// Welcome screen (prototype lines 134–180).
-import { computed } from 'vue';
-import { useInsightStore } from '../stores/insightStore.js';
-import { WELCOME_RECENTS } from '@/data/insightData.js';
+// Welcome screen (prototype lines 134–180) on real data (epic 1 FR-001..FR-003):
+// native folder dialog, drop zone, git check and recents from the preload bridge.
+import { computed, onMounted } from 'vue';
+import { useRepoStore } from '../stores/repoStore.js';
+import { formatRelative } from '../lib/indexingModel.js';
 import OmButton from '../components/ds/OmButton.vue';
 import logoUrl from '../assets/logo.svg';
 
-const store = useInsightStore();
-const tone = (s) =>
-  s >= 80 ? ['var(--om-tone-green-bg)', 'var(--om-tone-green-fg)']
-    : s >= 60 ? ['var(--om-tone-yellow-bg)', 'var(--om-tone-yellow-fg)']
-      : ['var(--om-tone-red-bg)', 'var(--om-tone-red-fg)'];
+const repoStore = useRepoStore();
+const canOpen = computed(() => repoStore.canOpen);
+const gitMissing = computed(() => repoStore.gitMissing);
+const gitMessage = computed(() => repoStore.git?.message || '');
+const openError = computed(() => repoStore.openError);
 const recents = computed(() =>
-  WELCOME_RECENTS.map(([name, path, lang, score, when, status, statusFg]) => {
-    const [bg, fg] = tone(score);
-    return { name, path, lang, score, when, status, statusFg, bg, fg, open: () => store.go('indexing', { t: 34 }) };
-  }),
+  repoStore.recents.map((e) => ({
+    id: e.repoId,
+    name: e.displayName || e.path,
+    path: e.path,
+    lang: '',
+    score: '—',
+    bg: 'var(--om-tone-neutral-bg)',
+    fg: 'var(--om-tone-neutral-fg)',
+    when: e.lastAnalysedAt ? 'Analysed ' + formatRelative(e.lastAnalysedAt) : 'Not analysed yet',
+    status: 'Opened ' + formatRelative(e.lastOpenedAt),
+    statusFg: 'var(--om-text-muted)',
+    open: () => repoStore.openPath(e.path),
+    remove: () => repoStore.remove(e.repoId),
+  })),
 );
-const openRepo = () => store.go('indexing', { t: 34 });
+const openRepo = () => repoStore.openDialog();
+const onDrop = (e) => {
+  const file = e.dataTransfer?.files?.[0];
+  if (file) repoStore.openDropped(file);
+};
+onMounted(() => repoStore.loadWelcome());
 </script>
 
 <template>
@@ -30,13 +46,21 @@ const openRepo = () => store.go('indexing', { t: 34 });
           <p style="margin:0;font-size:.9rem;color:var(--om-text-muted);text-wrap:pretty;line-height:1.55">Point Codebase Insight at any local git repo. It maps dependencies, history, hotspots and risk — then lets you ask questions about it.</p>
         </div>
         <div style="display:flex;gap:8px;align-items:center">
-          <OmButton variant="primary" icon="folder-open-outline" @click="openRepo">Open Folder…</OmButton>
+          <OmButton variant="primary" icon="folder-open-outline" :disabled="!canOpen" @click="openRepo">Open Folder…</OmButton>
           <span style="font-family:var(--font-mono);font-size:.65rem;padding:1px 6px;border:1px solid var(--om-border);border-radius:3px;color:var(--om-text-muted)">⌘O</span>
         </div>
-        <div @click="openRepo" v-hover="'border-color:var(--om-teal);color:var(--om-text)'" style="border:1.5px dashed var(--om-border);border-radius:8px;padding:28px 20px;display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--om-text-muted);cursor:pointer;transition:border-color .15s">
+        <div data-drop-zone @click="openRepo" @dragover.prevent @dragenter.prevent @drop.prevent="onDrop" v-hover="'border-color:var(--om-teal);color:var(--om-text)'" :style="{ border: '1.5px dashed var(--om-border)', borderRadius: '8px', padding: '28px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', color: 'var(--om-text-muted)', cursor: canOpen ? 'pointer' : 'default', opacity: gitMissing ? 0.5 : 1, transition: 'border-color .15s' }">
           <span class="mdi mdi-tray-arrow-down" style="font-size:1.6rem"></span>
           <span style="font-size:.82rem">Drop a repository folder here</span>
           <span style="font-size:.7rem;color:var(--om-text-placeholder)">Any folder containing a <span style="font-family:var(--font-mono)">.git</span> directory</span>
+        </div>
+        <div v-if="gitMissing" data-git-missing style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:6px;background:var(--om-tone-red-bg);color:var(--om-tone-red-fg);font-size:.78rem;line-height:1.5">
+          <span class="mdi mdi-alert-circle-outline" style="font-size:1.05rem;margin-top:1px"></span>
+          <span><b style="font-weight:600">Git is not available.</b> {{ gitMessage }}</span>
+        </div>
+        <div v-if="openError" data-open-error style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:6px;background:var(--om-tone-red-bg);color:var(--om-tone-red-fg);font-size:.78rem;line-height:1.5">
+          <span class="mdi mdi-alert-circle-outline" style="font-size:1.05rem;margin-top:1px"></span>
+          <span>{{ openError }}</span>
         </div>
         <div style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:6px;background:var(--om-mint-tint);font-size:.78rem;line-height:1.5">
           <span class="mdi mdi-shield-lock-outline" style="color:var(--om-mint);font-size:1.05rem;margin-top:1px"></span>
@@ -49,16 +73,18 @@ const openRepo = () => store.go('indexing', { t: 34 });
           <span style="font-size:.68rem;color:var(--om-text-placeholder)">↑↓ to select · ⏎ to open</span>
         </div>
         <div style="background:var(--om-card);border:1px solid var(--om-border);border-radius:8px;overflow:hidden">
-          <div v-for="r in recents" :key="r.name" @click="r.open" v-hover="'background:var(--om-card-raised)'" style="display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 14px;border-bottom:1px solid var(--om-border);cursor:pointer;transition:background .12s">
+          <div v-if="!recents.length" style="padding:20px 14px;font-size:.78rem;color:var(--om-text-placeholder)">No recent repositories yet. Open a folder to get started.</div>
+          <div v-for="r in recents" :key="r.id" data-recent @click="r.open" v-hover="'background:var(--om-card-raised)'" :style="{ display: 'grid', gridTemplateColumns: '40px minmax(0,1fr) auto auto', gap: '12px', alignItems: 'center', padding: '12px 14px', borderBottom: '1px solid var(--om-border)', cursor: canOpen ? 'pointer' : 'default', transition: 'background .12s' }">
             <div :style="{ width: '40px', height: '40px', borderRadius: '999px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-mono)', fontSize: '.8rem', fontWeight: 600, background: r.bg, color: r.fg }" title="Health score">{{ r.score }}</div>
             <div style="min-width:0;display:flex;flex-direction:column;gap:2px">
-              <div style="display:flex;align-items:center;gap:8px"><span style="font-size:.88rem;font-weight:600;color:var(--om-text-strong)">{{ r.name }}</span><span style="font-size:.65rem;padding:0 6px;border-radius:999px;background:var(--om-tone-neutral-bg);color:var(--om-tone-neutral-fg)">{{ r.lang }}</span></div>
+              <div style="display:flex;align-items:center;gap:8px"><span style="font-size:.88rem;font-weight:600;color:var(--om-text-strong)">{{ r.name }}</span><span v-if="r.lang" style="font-size:.65rem;padding:0 6px;border-radius:999px;background:var(--om-tone-neutral-bg);color:var(--om-tone-neutral-fg)">{{ r.lang }}</span></div>
               <span style="font-family:var(--font-mono);font-size:.7rem;color:var(--om-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.path }}</span>
             </div>
             <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
               <span style="font-size:.7rem;color:var(--om-text-label)">{{ r.when }}</span>
               <span :style="{ fontSize: '.65rem', color: r.statusFg }">{{ r.status }}</span>
             </div>
+            <button class="om-ghost-icon" title="Remove from recents" @click.stop="r.remove"><span class="mdi mdi-close"></span></button>
           </div>
         </div>
       </div>

@@ -2,11 +2,16 @@
 // Title bar (prototype lines 28–56).
 import { computed } from 'vue';
 import { useInsightStore } from '../../stores/insightStore.js';
+import { useRepoStore } from '../../stores/repoStore.js';
+import { shortSha } from '../../lib/indexingModel.js';
 import logoUrl from '../../assets/logo.svg';
 
 const store = useInsightStore();
+const repoStore = useRepoStore();
 const S = store.state;
 const hasRepo = computed(() => store.scr !== 'welcome');
+const repoName = computed(() => repoStore.repo?.name || '');
+const branch = computed(() => repoStore.repo?.branch || shortSha(repoStore.repo?.headSha) || '');
 const titlebarBg = computed(() => S.tbColor || 'var(--om-titlebar)');
 const llmBadge = computed(() =>
   S.llm === 'local' ? 'Local · Ollama'
@@ -25,9 +30,9 @@ const win = (action) => window.insight?.window?.[action]?.();
     </div>
     <template v-if="hasRepo">
       <div style="width:1px;height:14px;background:rgba(255,255,255,.2)"></div>
-      <div style="display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:.72rem;white-space:nowrap">
-        <span style="color:rgba(255,255,255,.9)">harbor-api</span>
-        <span style="display:flex;align-items:center;gap:3px;padding:1px 6px;border-radius:3px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.7)"><span class="mdi mdi-source-branch"></span>main</span>
+      <div data-titlebar-repo style="display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:.72rem;white-space:nowrap">
+        <span style="color:rgba(255,255,255,.9)">{{ repoName }}</span>
+        <span v-if="branch" style="display:flex;align-items:center;gap:3px;padding:1px 6px;border-radius:3px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.7)"><span class="mdi mdi-source-branch"></span>{{ branch }}</span>
       </div>
     </template>
     <div style="flex:1;display:flex;justify-content:center;min-width:0">

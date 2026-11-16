@@ -1,10 +1,13 @@
 <script setup>
 // App shell (prototype root, lines 26–1781): title bar, sidebar, active screen,
-// status bar, command palette and toast, plus the global keyboard shortcuts and
-// the indexing progress ticker from the prototype's componentDidMount.
+// status bar, command palette and toast, plus the global keyboard shortcuts.
+// The status bar reads the open repo and run from repoStore (epic 1 UI notes §6);
+// the prototype's indexing ticker is gone, real worker events drive progress.
 import { computed, onMounted, onBeforeUnmount } from 'vue';
 import { useAppStore } from './stores/appStore.js';
 import { useInsightStore } from './stores/insightStore.js';
+import { useRepoStore } from './stores/repoStore.js';
+import { formatRelative } from './lib/indexingModel.js';
 import { NAV } from './lib/constants.js';
 import { palItems } from './lib/palette.js';
 import TitleBar from './components/shell/TitleBar.vue';
@@ -29,6 +32,7 @@ import SettingsView from './views/SettingsView.vue';
 
 const appStore = useAppStore();
 const store = useInsightStore();
+const repoStore = useRepoStore();
 const S = store.state;
 
 const VIEWS = {
@@ -42,15 +46,20 @@ const hasRepo = computed(() => store.scr !== 'welcome');
 
 const sb = computed(() => {
   const scr = store.scr;
+  const repo = repoStore.repo;
+  const info = repoStore.info;
+  if (scr === 'welcome' || !repo) return { path: 'No repository open', branch: '', project: '' };
+  const analysing = scr === 'indexing' || repoStore.indexing;
   return {
-    path: scr === 'welcome' ? 'No repository open' : '~/dev/harbor-api',
-    branch: scr === 'welcome' ? '' : 'main',
-    project: scr === 'welcome' ? '' : scr === 'indexing' ? 'Analysing… ' + Math.round(S.t) + '%' : '612 files · analysed 2h ago',
+    path: repo.path,
+    branch: repo.branch || (repo.headSha || '').slice(0, 7),
+    project: analysing
+      ? 'Analysing… ' + Math.round(repoStore.progress * 100) + '%'
+      : (info?.fileCount ?? 0).toLocaleString() + ' files · analysed ' + formatRelative(info?.analysedAt ?? repo.lastAnalysedAt),
   };
 });
 const build = computed(() => 'Codebase Insight ' + (appStore.version || ''));
 
-let timer = null;
 function onKey(e) {
   const mod = e.metaKey || e.ctrlKey;
   const k = e.key.toLowerCase();
@@ -68,18 +77,17 @@ function onKey(e) {
   if (mod && /^[1-9]$/.test(e.key) && store.scr !== 'welcome') { e.preventDefault(); store.go(NAV[+e.key - 1].id); }
   if (mod && e.key === ',') { e.preventDefault(); store.go('settings'); }
   if (mod && k === 'b') { e.preventDefault(); store.setState((s) => ({ collapsed: !s.collapsed })); }
-  if (mod && k === 'o') { e.preventDefault(); store.go('welcome'); }
+  if (mod && k === 'o') { e.preventDefault(); repoStore.openDialog(); }
+  if (mod && k === 'r') { e.preventDefault(); repoStore.refresh(); }
 }
 
 onMounted(() => {
   appStore.loadAppInfo();
-  timer = setInterval(() => {
-    if (store.scr === 'indexing' && S.t < 100) store.setState((s) => ({ t: Math.min(100, s.t + 0.3) }));
-  }, 120);
+  repoStore.start();
   window.addEventListener('keydown', onKey);
 });
 onBeforeUnmount(() => {
-  clearInterval(timer);
+  repoStore.stop();
   window.removeEventListener('keydown', onKey);
 });
 </script>

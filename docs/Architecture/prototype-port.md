@@ -70,8 +70,8 @@ src/renderer/
 | Command palette (1752–1776) + `palItems()` | `components/shell/CommandPalette.vue`, `lib/palette.js` |
 | `componentDidMount` keyboard handler + indexing interval | `App.vue` (`onKey`, `setInterval`) |
 | `state={…}`, `setState`, `go`, `toast` | `stores/insightStore.js` |
-| Welcome (`is.welcome`) | `views/WelcomeView.vue`, `mock/screens/welcome.js` |
-| Indexing (`is.indexing`) | `views/IndexingView.vue`, `mock/screens/indexing.js` |
+| Welcome (`is.welcome`) | `views/WelcomeView.vue` (real data since OPINV-006; `mock/screens/welcome.js` deleted) |
+| Indexing (`is.indexing`) | `views/IndexingView.vue` (real data since OPINV-006; `mock/screens/indexing.js` deleted) |
 | Overview (`is.overview`, 4 view states) | `views/OverviewView.vue`, `mock/screens/overview.js` |
 | Size & Inventory (`is.inventory`) | `views/InventoryView.vue`, `mock/screens/inventory.js` |
 | Architecture (`is.architecture`) | `views/ArchitectureView.vue` |
@@ -180,9 +180,12 @@ Each item is intentional. The reason is the constraint that forced it.
   *Regenerate*.
 - The Overview mini treemap colours by the current hotspot metric (`S.metric`) even
   though its label reads "Churn × Complexity".
-- "Open Folder…" on Welcome goes straight to Indexing (no folder picker); recent rows
-  start Indexing; all AI answers, explanations, tests and exports are mocked with
-  timers and toasts.
+- All AI answers, explanations, tests and exports are mocked with timers and toasts.
+  (Welcome's "Open Folder…", drop zone and recents, the Indexing screen, the title
+  bar, sidebar footer and status bar run on real data since epic 1 / OPINV-006:
+  `stores/repoStore.js` + `lib/indexingModel.js` over the `window.insight` bridge.
+  ⌘O opens the native dialog and ⌘R re-runs the analysis; the health pill and the
+  recent-row score chip show "—" until Epic 5.)
 
 ## Not ported
 

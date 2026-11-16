@@ -2,6 +2,7 @@
 // overlay and the global keyboard handler.
 import { NAV } from './constants.js';
 import { FILES } from '../data/insightData.js';
+import { useRepoStore } from '../stores/repoStore.js';
 
 export function palItems(store) {
   const S = store.state;
@@ -15,7 +16,7 @@ export function palItems(store) {
   ].filter((i) => m(i.label));
   const act = [
     { label: 'Ask the codebase…', icon: 'chat-question-outline', hint: '⌘J', run: () => go('ask') },
-    { label: 'Re-analyse repository', icon: 'refresh', hint: '⌘R', run: () => go('indexing', { t: 0 }) },
+    { label: 'Re-analyse repository', icon: 'refresh', hint: '⌘R', run: () => { store.setState({ pal: false }); useRepoStore().refresh(); } },
     { label: 'Explain selected hotspot', icon: 'creation', hint: '⌘E', run: () => go('hotspots', { explain: 'done' }) },
     { label: 'Export report…', icon: 'export-variant', hint: '⌘⇧E', run: () => go('report') },
     { label: 'Toggle light / dark theme', icon: 'theme-light-dark', hint: '⌘⇧L', run: () => store.setState((s) => ({ pal: false, theme: (s.theme || store.props.theme || 'dark') === 'dark' ? 'light' : 'dark' })) },

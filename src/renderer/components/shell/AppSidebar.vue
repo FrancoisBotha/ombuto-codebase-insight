@@ -2,10 +2,25 @@
 // Sidebar navigation (prototype lines 60–130).
 import { computed } from 'vue';
 import { useInsightStore } from '../../stores/insightStore.js';
+import { useRepoStore } from '../../stores/repoStore.js';
 import { NAV } from '../../lib/constants.js';
+import { formatRelative, shortSha } from '../../lib/indexingModel.js';
 
 const store = useInsightStore();
+const repoStore = useRepoStore();
 const S = store.state;
+
+const repoName = computed(() => repoStore.repo?.name || '');
+// Footer "Analysed … · <sha>": real analysed time and HEAD; live while a run is in flight.
+const footer = computed(() => {
+  const repo = repoStore.repo;
+  const run = repoStore.run;
+  const sha = shortSha(repo?.headSha);
+  if (run.status === 'running') return { icon: 'mdi-loading mdi-spin', fg: 'var(--om-teal)', text: 'Analysing… ' + Math.round(repoStore.progress * 100) + '%' + (sha ? ' · ' + sha : '') };
+  if (run.status === 'failed') return { icon: 'mdi-alert-circle-outline', fg: 'var(--om-danger)', text: 'Analysis failed' + (sha ? ' · ' + sha : '') };
+  const at = repoStore.info?.analysedAt ?? repo?.lastAnalysedAt ?? null;
+  return { icon: 'mdi-check-circle-outline', fg: 'var(--om-mint)', text: 'Analysed ' + formatRelative(at) + (sha ? ' · ' + sha : '') };
+});
 
 const nav = computed(() =>
   NAV.map((n) => ({
@@ -27,7 +42,7 @@ const settingsCls = computed(() => 'om-board-item' + (store.scr === 'settings' ?
 const settingsCCls = computed(() => 'om-collapsed-item' + (store.scr === 'settings' ? ' is-active' : ''));
 const toggleDrawer = () => store.setState((s) => ({ collapsed: !s.collapsed }));
 const goSettings = () => store.go('settings');
-const reanalyse = () => store.go('indexing', { t: 0 });
+const reanalyse = () => repoStore.refresh();
 </script>
 
 <template>
@@ -36,9 +51,9 @@ const reanalyse = () => store.go('indexing', { t: 0 });
       <div style="display:flex;align-items:center;gap:8px;padding:10px 12px 10px 16px;border-bottom:1px solid rgba(255,255,255,.06);min-height:48px">
         <div style="flex:1;min-width:0;display:flex;flex-direction:column">
           <span style="font-size:.6rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:rgba(255,255,255,.3)">Repository</span>
-          <span style="font-family:var(--font-mono);font-size:.78rem;color:rgba(255,255,255,.85)">harbor-api</span>
+          <span data-sidebar-repo style="font-family:var(--font-mono);font-size:.78rem;color:rgba(255,255,255,.85);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ repoName }}</span>
         </div>
-        <span style="font-family:var(--font-mono);font-size:.7rem;font-weight:600;padding:1px 6px;border-radius:999px;background:var(--om-tone-yellow-bg);color:var(--om-tone-yellow-fg)" title="Health score">72</span>
+        <span data-health-pill style="font-family:var(--font-mono);font-size:.7rem;font-weight:600;padding:1px 6px;border-radius:999px;background:var(--om-tone-neutral-bg);color:var(--om-tone-neutral-fg)" title="Health score">—</span>
         <button class="om-ghost-icon" @click="toggleDrawer" title="Collapse  ⌘B"><span class="mdi mdi-chevron-double-left"></span></button>
       </div>
       <div style="flex:1;overflow:auto;padding:8px 0;display:flex;flex-direction:column;gap:2px">
@@ -57,9 +72,9 @@ const reanalyse = () => store.go('indexing', { t: 0 });
           <span style="flex:1">Settings</span>
           <span style="font-family:var(--font-mono);font-size:.6rem;color:rgba(255,255,255,.25)">⌘,</span>
         </div>
-        <div style="padding:6px 16px 2px;font-size:.65rem;color:rgba(255,255,255,.35);display:flex;align-items:center;gap:6px">
-          <span class="mdi mdi-check-circle-outline" style="color:var(--om-mint)"></span>
-          <span style="flex:1">Analysed 2h ago · a91f3c2</span>
+        <div data-sidebar-footer style="padding:6px 16px 2px;font-size:.65rem;color:rgba(255,255,255,.35);display:flex;align-items:center;gap:6px">
+          <span :class="'mdi ' + footer.icon" :style="{ color: footer.fg }"></span>
+          <span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ footer.text }}</span>
           <span @click="reanalyse" style="cursor:pointer;color:rgba(255,255,255,.55)" title="Re-analyse  ⌘R"><span class="mdi mdi-refresh"></span></span>
         </div>
       </div>
