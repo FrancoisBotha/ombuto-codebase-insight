@@ -3,7 +3,7 @@
 Status: NEW
 Owner: human
 Created: 2026-11-15
-Last Updated: 2026-11-15
+Last Updated: 2026-11-17
 Depends On: epic_01_OPEN_AND_INVENTORY
 
 ---
@@ -60,11 +60,13 @@ So that I know which code is hardest to change safely.
 ## 4. Functional Requirements
 1. FR-011 — Extract files parses every supported-language blob with
    `web-tree-sitter` and writes `raw_symbol` and `raw_function` (params,
-   lines, decision points, max nesting, nesting weight). A blob that fails
+   lines, decision points, max nesting, nesting weight, cognitive
+   complexity computed from the syntax tree; see §7). A blob that fails
    to parse is marked `parse_status = error` with its error, and the stage
    carries on.
-2. FR-012 — A Transform stage computes `metric_function` (cyclomatic,
-   cognitive, band) and `metric_file` (loc excluding blank and comment
+2. FR-012 — A Transform stage computes `metric_function` (cyclomatic =
+   decision points + 1, cognitive copied from `raw_function.cognitive`,
+   band) and `metric_file` (loc excluding blank and comment
    lines, function count, complexity sum and max, module path, is_test from
    path conventions) for the analysed commit.
 3. FR-013 — The Complexity screen shows the stat strip, distribution
@@ -101,6 +103,16 @@ So that I know which code is hardest to change safely.
 ## 7. Data Model Impact
 - Writes `raw_symbol`, `raw_function`, `metric_function` and `metric_file`.
   `raw_blob.parse_status` becomes `parsed`, `skipped` or `error`.
+- **Expected schema change (same ticket as the first extraction ticket):**
+  add `raw_function.cognitive INTEGER NOT NULL`, computed during extraction
+  while the syntax tree is in hand. Cognitive complexity (SonarSource spec)
+  can't be rebuilt in Transform from `decision_points` and
+  `nesting_weight`: it adds flat increments with no nesting penalty
+  (`else`, `else if`, labelled `break`/`goto`, recursion) and counts each
+  run of identical boolean operators once (`a && b && c` adds 1), so a
+  Transform-time value would only approximate it. `metric_function.cognitive`
+  stays and is copied from `raw_function`. Update `Schema.ddl` and run
+  `tests/unit/schema.test.js`.
 - **Expected schema change (same ticket as the Transform stage):**
   `metric_file` has NOT NULL columns this epic can't fill yet:
   `churn_commits`, `churn_lines`, `author_count`, `bus_factor`,
@@ -123,7 +135,10 @@ So that I know which code is hardest to change safely.
       a function's lines in Files, end to end, without any other epic being
       complete.
 - [ ] Each supported language has a unit test showing symbol and
-      decision-point extraction on a small fixture.
+      decision-point extraction on a small fixture, including an expected
+      cognitive complexity value.
+- [ ] `raw_function.cognitive` is in `Schema.ddl`, and the schema test
+      passes.
 - [ ] A deliberately broken file is marked `error` and doesn't fail the run.
 - [ ] Inventory shows real comment/blank lines and symbol counts.
 - [ ] `metric_file` nullability change is in `Schema.ddl`, and the schema
@@ -161,8 +176,10 @@ Do NOT regenerate the code map inside a feature ticket. Mid-epic the map is expe
 
 Suggested tickets (complexity: medium-high, about 7 tickets):
 1. Grammar loader in the worker, plus symbol and function extraction for
-   TS/JS/TSX and Python (back end).
-2. Symbol and function extraction for Java, C#, Go, Rust and SQL (back end).
+   TS/JS/TSX and Python, including cognitive complexity and the
+   `raw_function.cognitive` schema change (back end).
+2. Symbol and function extraction for Java, C#, Go, Rust and SQL, including
+   cognitive complexity (back end).
 3. Transform stage: `metric_function`, `metric_file`, and the `Schema.ddl`
    nullability change (back end).
 4. IPC queries for complexity, file metrics and inventory symbol counts
